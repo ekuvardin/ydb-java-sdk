@@ -10,6 +10,8 @@ import tech.ydb.proto.scheme.SchemeOperationProtos.DescribePathResult;
 import tech.ydb.proto.scheme.SchemeOperationProtos.ListDirectoryRequest;
 import tech.ydb.proto.scheme.SchemeOperationProtos.ListDirectoryResult;
 import tech.ydb.proto.scheme.SchemeOperationProtos.MakeDirectoryRequest;
+import tech.ydb.proto.scheme.SchemeOperationProtos.ModifyPermissionsRequest;
+import tech.ydb.proto.scheme.SchemeOperationProtos.ModifyPermissionsResponse;
 import tech.ydb.proto.scheme.SchemeOperationProtos.RemoveDirectoryRequest;
 
 
@@ -57,4 +59,7 @@ public interface SchemeRpc extends AutoCloseable {
     CompletableFuture<Result<DescribePathResult>> describePath(DescribePathRequest request,
             GrpcRequestSettings settings);
 
+    CompletableFuture<Result<ModifyPermissionsResponse>> modifyPermissions(
+                                                    ModifyPermissionsRequest request,
+                                                    GrpcRequestSettings settings);
 }

@@ -19,6 +19,8 @@ import tech.ydb.proto.scheme.SchemeOperationProtos.ListDirectoryResponse;
 import tech.ydb.proto.scheme.SchemeOperationProtos.ListDirectoryResult;
 import tech.ydb.proto.scheme.SchemeOperationProtos.MakeDirectoryRequest;
 import tech.ydb.proto.scheme.SchemeOperationProtos.MakeDirectoryResponse;
+import tech.ydb.proto.scheme.SchemeOperationProtos.ModifyPermissionsRequest;
+import tech.ydb.proto.scheme.SchemeOperationProtos.ModifyPermissionsResponse;
 import tech.ydb.proto.scheme.SchemeOperationProtos.RemoveDirectoryRequest;
 import tech.ydb.proto.scheme.SchemeOperationProtos.RemoveDirectoryResponse;
 import tech.ydb.proto.scheme.v1.SchemeServiceGrpc;
@@ -75,6 +77,16 @@ public final class GrpcSchemeRpc implements SchemeRpc {
         return transport
                 .unaryCall(SchemeServiceGrpc.getDescribePathMethod(), settings, request)
                 .thenApply(OperationBinder.bindSync(DescribePathResponse::getOperation, DescribePathResult.class));
+    }
+
+    @Override
+    public CompletableFuture<Result<ModifyPermissionsResponse>> modifyPermissions(ModifyPermissionsRequest request,
+                                                                                  GrpcRequestSettings settings) {
+        return transport
+                .unaryCall(SchemeServiceGrpc.getModifyPermissionsMethod(), settings, request)
+                .thenApply(OperationBinder.bindSync(ModifyPermissionsResponse::getOperation,
+                                                    ModifyPermissionsResponse.class));
+
     }
 
     @Override

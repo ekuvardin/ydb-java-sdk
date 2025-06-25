@@ -1,6 +1,7 @@
 package tech.ydb.scheme.impl;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.base.Splitter;
@@ -12,6 +13,8 @@ import tech.ydb.proto.scheme.SchemeOperationProtos;
 import tech.ydb.scheme.SchemeClient;
 import tech.ydb.scheme.description.DescribePathResult;
 import tech.ydb.scheme.description.ListDirectoryResult;
+import tech.ydb.scheme.description.ModifyPermissionsResponse;
+import tech.ydb.scheme.description.PermissionDescription;
 
 /**
  * @author Sergey Polovko
@@ -112,6 +115,41 @@ public class SchemeClientImpl implements SchemeClient {
         return schemeRpc
                 .describeDirectory(request, grpcRequestSettings)
                 .thenApply(result -> result.map(ListDirectoryResult::new));
+    }
+
+    @Override
+    public CompletableFuture<Result<ModifyPermissionsResponse>> modifyPermissions(
+            String path, PermissionDescription permissionDescription) {
+        //TODO permissionDescription.getActionList() check null or empty
+
+        SchemeOperationProtos.ModifyPermissionsRequest.Builder builder =  SchemeOperationProtos.ModifyPermissionsRequest
+                .newBuilder()
+                .setPath(path)
+                .setClearPermissions(permissionDescription.isClear());
+
+        for (SchemeOperationProtos.PermissionsAction action : permissionDescription.getActionList()) {
+            builder.addActions(action);
+        }
+
+        SchemeOperationProtos.ModifyPermissionsRequest request = builder.build();
+        final GrpcRequestSettings grpcRequestSettings = GrpcRequestSettings.newBuilder().build();
+
+        CompletableFuture<Result<SchemeOperationProtos.ModifyPermissionsResponse>> list
+                =  schemeRpc
+                .modifyPermissions(request, grpcRequestSettings);
+        CompletableFuture<Result<ModifyPermissionsResponse>> res = list.thenApply(result -> {
+            result.getStatus();
+           return null;
+        });
+
+        return res;
+
+        /*
+        return schemeRpc
+                .modifyPermissions(request, grpcRequestSettings)
+                .thenApply(result ->  {
+                    response = new ModifyPermissionsResponse(result.getValue());
+                });*/
     }
 
     @Override

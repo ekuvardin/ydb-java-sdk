@@ -9,6 +9,8 @@ import tech.ydb.core.Status;
 import tech.ydb.core.grpc.GrpcTransport;
 import tech.ydb.scheme.description.DescribePathResult;
 import tech.ydb.scheme.description.ListDirectoryResult;
+import tech.ydb.scheme.description.ModifyPermissionsResponse;
+import tech.ydb.scheme.description.PermissionDescription;
 import tech.ydb.scheme.impl.GrpcSchemeRpc;
 import tech.ydb.scheme.impl.SchemeClientImpl;
 
@@ -44,6 +46,9 @@ public interface SchemeClient extends AutoCloseable {
     CompletableFuture<Result<DescribePathResult>> describePath(String path);
 
     CompletableFuture<Result<ListDirectoryResult>> listDirectory(String path);
+
+    CompletableFuture<Result<ModifyPermissionsResponse>> modifyPermissions(String path,
+                                                                           PermissionDescription permissionDescription);
 
     @Override
     void close();
