@@ -52,6 +52,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>tech.ydb</groupId>
+            <artifactId>ydb-sdk-query</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>tech.ydb.test</groupId>
             <artifactId>ydb-junit4-support</artifactId>
             <scope>test</scope>

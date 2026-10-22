@@ -5,6 +5,9 @@ import java.util.concurrent.Executor;
 
 import javax.annotation.WillNotClose;
 
+import io.grpc.ExperimentalApi;
+
+import tech.ydb.common.transaction.YdbTransaction;
 import tech.ydb.core.Result;
 import tech.ydb.core.Status;
 import tech.ydb.core.grpc.GrpcTransport;
@@ -24,7 +27,9 @@ import tech.ydb.topic.settings.DropTopicSettings;
 import tech.ydb.topic.settings.ReadEventHandlersSettings;
 import tech.ydb.topic.settings.ReaderSettings;
 import tech.ydb.topic.settings.WriterSettings;
+import tech.ydb.topic.write.AsyncTransactionalWriter;
 import tech.ydb.topic.write.AsyncWriter;
+import tech.ydb.topic.write.SyncTransactionalWriter;
 import tech.ydb.topic.write.SyncWriter;
 
 
@@ -155,12 +160,44 @@ public interface TopicClient extends AutoCloseable {
     SyncWriter createSyncWriter(WriterSettings settings);
 
     /**
+     * Create sync topic writer bound to an existing transaction.
+     *
+     * The writer does not commit or roll back the transaction. Transaction lifecycle is owned by the caller.
+     * Topic messages written through this writer become visible only after successful transaction commit.
+     *
+     * Retry behavior is controlled by transaction-level retry logic. Retry the whole transaction attempt
+     * (table/query operations and topic writes together) on retriable errors.
+     *
+     * @param transaction active transaction to attach all writes to
+     * @param settings  {@link WriterSettings}
+     * @return topic {@link SyncTransactionalWriter}
+     */
+    @ExperimentalApi("New transaction interfaces are experimental and may change without notice")
+    SyncTransactionalWriter createSyncTransactionalWriter(YdbTransaction transaction, WriterSettings settings);
+
+    /**
      * Create async topic writer.
      *
      * @param settings  {@link WriterSettings}
      * @return topic {@link AsyncWriter}
      */
     AsyncWriter createAsyncWriter(WriterSettings settings);
+
+    /**
+     * Create async topic writer bound to an existing transaction.
+     *
+     * The writer does not commit or roll back the transaction. Transaction lifecycle is owned by the caller.
+     * Topic messages written through this writer become visible only after successful transaction commit.
+     *
+     * Retry behavior is controlled by transaction-level retry logic. Retry the whole transaction attempt
+     * (table/query operations and topic writes together) on retriable errors.
+     *
+     * @param transaction active transaction to attach all writes to
+     * @param settings  {@link WriterSettings}
+     * @return topic {@link AsyncTransactionalWriter}
+     */
+    @ExperimentalApi("New transaction interfaces are experimental and may change without notice")
+    AsyncTransactionalWriter createAsyncTransactionalWriter(YdbTransaction transaction, WriterSettings settings);
 
     @Override
     void close();

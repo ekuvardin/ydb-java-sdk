@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import tech.ydb.common.transaction.YdbTransaction;
 import tech.ydb.core.Result;
 import tech.ydb.core.Status;
 import tech.ydb.core.grpc.GrpcRequestSettings;
@@ -50,9 +51,13 @@ import tech.ydb.topic.settings.ReadEventHandlersSettings;
 import tech.ydb.topic.settings.ReaderSettings;
 import tech.ydb.topic.settings.TopicClientOperationSettings;
 import tech.ydb.topic.settings.WriterSettings;
+import tech.ydb.topic.write.AsyncTransactionalWriter;
 import tech.ydb.topic.write.AsyncWriter;
+import tech.ydb.topic.write.SyncTransactionalWriter;
 import tech.ydb.topic.write.SyncWriter;
+import tech.ydb.topic.write.impl.AsyncTransactionalWriterImpl;
 import tech.ydb.topic.write.impl.AsyncWriterImpl;
+import tech.ydb.topic.write.impl.SyncTransactionalWriterImpl;
 import tech.ydb.topic.write.impl.SyncWriterImpl;
 
 /**
@@ -403,8 +408,19 @@ public class TopicClientImpl implements TopicClient {
     }
 
     @Override
+    public SyncTransactionalWriter createSyncTransactionalWriter(YdbTransaction transaction, WriterSettings settings) {
+        return new SyncTransactionalWriterImpl(createSyncWriter(settings), transaction);
+    }
+
+    @Override
     public AsyncWriter createAsyncWriter(WriterSettings settings) {
         return new AsyncWriterImpl(topicRpc, settings, compressionExecutor, codecRegistry);
+    }
+
+    @Override
+    public AsyncTransactionalWriter createAsyncTransactionalWriter(
+            YdbTransaction transaction, WriterSettings settings) {
+        return new AsyncTransactionalWriterImpl(createAsyncWriter(settings), transaction);
     }
 
     @Override
